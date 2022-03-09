@@ -18,17 +18,20 @@ const btnSave = document.querySelector('.form_btn--save');
 
 const newFormData = function (formID) {
   const form = document.getElementById('form' + formID);
-
-  console.log(form);
-
   const inputName = document.getElementById('inputName' + formID);
-  console.log(inputName);
 
   const inputType = document.getElementById('inputType' + formID);
   const inputLanguage = document.getElementById('inputLanguage' + formID);
   const inputLocation = document.getElementById('inputLocation' + formID);
 
-  const newBusiness = `
+  if (
+    inputName.value != '' &&
+    inputType.value != '' &&
+    inputLanguage.options[inputLanguage.selectedIndex].text !=
+      'Select language' &&
+    inputLocation.value != ''
+  ) {
+    const newBusiness = `
   <li class="business" >
   <h2 class="business_name">${inputName.value}</h2>
   <div class="business_details">
@@ -40,14 +43,30 @@ const newFormData = function (formID) {
     }</h3>
   </div>
   <div class="business_details">
-    <h3 class="business_location">${inputLocation.value}</h3>
+    <h3 class="business_location">${inputLocation.value}
+    <button type="button" class="form_btn business_btn--map">
+      <span class="business_btn--map_icon">
+        <ion-icon name="map-outline" role="img" class="md hydrated" aria-label="map outline"></ion-icon>
+      </span>
+    </button>
+    </h3>
+  </div>
+  <div class="business_details">
+    <button type="button" class="form__btn business_btn--opengm">
+    Open Google maps
+    </button>
   </div>
 </li>
 `;
 
-  form.insertAdjacentHTML('afterend', newBusiness);
+    form.insertAdjacentHTML('afterend', newBusiness);
 
-  form.remove();
+    form.remove();
+  } else {
+    alert(
+      '!!WARNING!! INVALID INPUT! You must fill in all parametres to save them!'
+    );
+  }
 };
 
 btnAdd.onclick = function () {
