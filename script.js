@@ -1,6 +1,80 @@
 'use strict';
+let currentPos;
+let coords;
+let map;
+let businessAdress = [];
+let formAmount = 1;
+let markers = {};
 
-let formAmount = 2;
+const showOnMap = function (formID) {
+  const businessID = formID.replace(/\D/g, '');
+
+  markers[businessID].openPopup();
+};
+
+const openGm = function (formID) {
+  const businessID = formID.replace(/\D/g, '');
+  const businessLocation = document.getElementById(
+    'businessAdress' + businessID
+  );
+
+  console.log(businessLocation.textContent);
+
+  console.log(businessAdress);
+
+  window.open(
+    `https://www.google.com/maps/place/${businessLocation.textContent}/@${businessAdress[businessID][0]}, ${businessAdress[businessID][1]}`
+  );
+};
+
+const apiKey =
+  'AAPK8010778b0f5f4125aaab7a3400c5fdabUVgNVHKxZ2mKDOhlZS881By7lT4g8u5N3VM-PmayJSt4lJ4RyxDA2WdBFPorPcod';
+const basemapEnum = 'ArcGIS:Navigation';
+
+if (navigator.geolocation) {
+  navigator.geolocation.getCurrentPosition(function (position) {
+    const { latitude } = position.coords;
+    const { longitude } = position.coords;
+
+    coords = [latitude, longitude];
+    map = L.map('map', {
+      minZoom: 2,
+    }).setView(coords, 14);
+
+    console.log(coords);
+
+    L.esri.Vector.vectorBasemapLayer(basemapEnum, {
+      apiKey: apiKey,
+    }).addTo(map);
+
+    const searchControl = L.esri.Geocoding.geosearch({
+      position: 'topleft',
+      placeholder: 'Enter an address or place',
+      useMapBounds: false,
+      providers: [
+        L.esri.Geocoding.arcgisOnlineProvider({
+          apikey: apiKey,
+          nearby: {
+            lat: coords[0],
+            lng: coords[1],
+          },
+        }),
+      ],
+    }).addTo(map);
+
+    var results = L.layerGroup().addTo(map);
+
+    searchControl.on('results', function (data) {
+      results.clearLayers();
+      for (var i = data.results.length - 1; i >= 0; i--) {
+        results.addLayer(L.marker(data.results[i].latlng));
+
+        currentPos = [data.results[i].latlng.lat, data.results[i].latlng.lng];
+        console.log(currentPos);
+      }
+    });
+  });
+}
 
 const form = document.querySelector('.form');
 const containerBusinesses = document.querySelector('.businesses');
@@ -43,8 +117,12 @@ const newFormData = function (formID) {
     }</h3>
   </div>
   <div class="business_details">
-    <h3 class="business_location">${inputLocation.value}
-    <button type="button" class="form_btn business_btn--map">
+    <h3 id = "${'businessAdress' + formID}" class="business_location">${
+      inputLocation.value
+    }
+    <button id="${
+      'showOnMap' + formID
+    }" type="button" class="form_btn business_btn--map" onclick="showOnMap(this.id)">
       <span class="business_btn--map_icon">
         <ion-icon name="map-outline" role="img" class="md hydrated" aria-label="map outline"></ion-icon>
       </span>
@@ -52,7 +130,9 @@ const newFormData = function (formID) {
     </h3>
   </div>
   <div class="business_details">
-    <button type="button" class="form__btn business_btn--opengm">
+    <button id="${
+      'openGm' + formID
+    }" type="button" class="form__btn business_btn--opengm" onclick="openGm(this.id)">
     Open Google maps
     </button>
   </div>
@@ -62,6 +142,26 @@ const newFormData = function (formID) {
     form.insertAdjacentHTML('afterend', newBusiness);
 
     form.remove();
+
+    businessAdress[formID] = currentPos;
+
+    console.log(businessAdress[formID]);
+
+    markers[formID] = L.marker(currentPos)
+      .addTo(map)
+      .bindPopup(
+        L.popup({
+          autoClose: false,
+          closeOnClick: false,
+          className: `business-popup`,
+        })
+      )
+      .setPopupContent(
+        `Name: ${inputName.value}<br/>Type: ${inputType.value}<br/>Language: ${
+          inputLanguage.options[inputLanguage.selectedIndex].text
+        }<br/>Adress: ${inputLocation.value}`
+      )
+      .openPopup();
   } else {
     alert(
       '!!WARNING!! INVALID INPUT! You must fill in all parametres to save them!'
@@ -70,6 +170,8 @@ const newFormData = function (formID) {
 };
 
 btnAdd.onclick = function () {
+  formAmount++;
+
   const newForm = `
 <form class="form_hidden" id = "${'form' + formAmount}">
           <div class="form__row">
@@ -257,23 +359,4 @@ btnAdd.onclick = function () {
 `;
 
   formRowBtnAdd.insertAdjacentHTML('beforebegin', newForm);
-
-  formAmount++;
 };
-
-if (navigator.geolocation)
-  navigator.geolocation.getCurrentPosition(function (position) {
-    const { latitude } = position.coords;
-    const { longitude } = position.coords;
-
-    const coords = [latitude, longitude];
-
-    const map = L.map('map').setView(coords, 13);
-
-    L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
-      attribution:
-        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-    }).addTo(map);
-
-    L.Control.geocoder().addTo(map);
-  });
