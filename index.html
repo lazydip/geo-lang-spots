@@ -25,27 +25,25 @@
     <link rel="stylesheet" href="https://unpkg.com/esri-leaflet-geocoder@3.0.0/dist/esri-leaflet-geocoder.css">
     <script src="https://unpkg.com/esri-leaflet-geocoder@3.0.0/dist/esri-leaflet-geocoder.js"></script>
 
-    
     <script defer src="script.js"></script>
+
     <title>Business MAP</title>
   </head>
   <body>
     <div class="sidebar">
-
       <ul class="businesses">
         <form class="form">
           <div class="form__row">
             <label class="form__label">Business name:</label>
-            <input id="inputName1" class="form__input form__input--name" />
+            <input class="form__input form__input--name" />
           </div>
           <div class="form__row">
             <label class="form__label">Business type:</label>
-            <input id="inputType1" class="form__input form__input--type" />
+            <input class="form__input form__input--type" />
           </div>
           <div class="form__row">
             <label class="form__label">Business language:</label>
             <select
-              id="inputLanguage1"
               class="form__input form__input--language"
             >
               <option value="">Select language</option>
@@ -208,11 +206,11 @@
             </button>
           </div>
         </form>
-        
         <div class="form__row" >
           <button id="btnAdd" type="button" class="form__btn form_btn--add">
             +
           </button>
+        </div>
       </ul>
       </div>
     </div>
