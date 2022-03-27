@@ -44,17 +44,30 @@ body {
 
 .business {
   background-color: #7c868f;
-  border-radius: px;
+  border-radius: 5px;
   padding: 1.5rem 2.25rem;
-  margin-bottom: 1.75rem;
+  margin-bottom: 20px;
   cursor: pointer;
   border-radius: 5px;
-
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr;
-  gap: 0.75rem 1.5rem;
+  height: 150px;
 }
 
+.business_btn--opengm {
+  border-radius: 12px;
+  border: none;
+  color: rgb(0, 0, 0);
+  background-color: rgba(0, 191, 255, 0.575);
+  padding: 1px 10px;
+
+  position: relative;
+  left: 150px;
+}
+.business_btn--map {
+  position: relative;
+
+  background-color: #7c868f;
+  border: none;
+}
 .business_name {
   font-size: 1.7rem;
   font-weight: 600;
@@ -76,7 +89,7 @@ body {
   margin-right: 0.5rem;
 }
 
-.form_hidden {
+.form {
   background-color: #7c868f;
   border-radius: 5px;
   padding: 1.5rem 2.75rem;
@@ -86,6 +99,10 @@ body {
 
   height: 140px;
   transition: all 0.5s, transform 1ms;
+}
+
+.form.hidden {
+  display: none;
 }
 
 .form__row {
@@ -115,7 +132,7 @@ body {
 .form__input--location {
   border: none;
   margin-left: 7px;
-  width: 163px;
+  width: 176px;
   background-color: lightgrey;
 }
 
@@ -142,9 +159,12 @@ body {
   padding: 1px 10px;
   margin: 4px 2px;
   position: relative;
-  left: 100px;
+  left: 210px;
 }
-
+.geocoder-control-input {
+  font-size: 1.3rem;
+  margin-right: 0.5rem;
+}
 .form_btn--add {
   border-radius: 50%;
   border: none;
@@ -154,8 +174,11 @@ body {
   padding: 8px 18px;
   margin: 15px 2px;
   position: relative;
-  left: 150px;
-  
+  left: 14rem;
+}
+
+.geocoder-control-suggestions {
+  color: black;
 }
 
 button:hover {

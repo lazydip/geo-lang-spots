@@ -19,7 +19,6 @@
       crossorigin=""
     ></script>
 
-    <!-- Load Esri Leaflet from CDN -->
     <script src="https://unpkg.com/esri-leaflet@3.0.4/dist/esri-leaflet.js"></script>
     <script src="https://unpkg.com/esri-leaflet-vector@3.0.0/dist/esri-leaflet-vector.js"></script>
     
@@ -28,13 +27,13 @@
 
     
     <script defer src="script.js"></script>
-
     <title>Business MAP</title>
   </head>
   <body>
     <div class="sidebar">
-      <ul class="businesses" id="businessesList">
-        <form class="form_hidden" id="form1">
+
+      <ul class="businesses">
+        <form class="form">
           <div class="form__row">
             <label class="form__label">Business name:</label>
             <input id="inputName1" class="form__input form__input--name" />
@@ -49,7 +48,7 @@
               id="inputLanguage1"
               class="form__input form__input--language"
             >
-              <option value="" disabled selected>Select language</option>
+              <option value="">Select language</option>
               <option value="af">Afrikaans</option>
               <option value="sq">Albanian</option>
               <option value="am">Amharic</option>
@@ -197,38 +196,24 @@
           <div class="form__row">
             <label class="form__label">Business location:</label>
             <input
-              id="inputLocation1"
-              class="form__input form__input--location"
+              class="form__input form__input--location"     
             />
-            <button type="button" class="form_btn form_btn--map">
-              <span class="form_btn--map_icon">
-                <ion-icon name="map-outline"></ion-icon>
-              </span>
-            </button>
-          </div>
-          <div class="form__row">
-            <button type="button" class="form__btn form_btn--opengm">
-              Open Google maps
-            </button>
           </div>
           <div class="form__row">
             <button
-              id="1"
               type="button"
               class="form__btn form_btn--save"
-              onclick="newFormData(this.id)"
             >
               Save
             </button>
           </div>
         </form>
         
-        <div class="form__row" id = "formRowBtnAdd">
+        <div class="form__row" >
           <button id="btnAdd" type="button" class="form__btn form_btn--add">
             +
           </button>
       </ul>
-      
       </div>
     </div>
     
