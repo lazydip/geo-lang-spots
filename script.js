@@ -13,73 +13,67 @@ let busisnesses = [];
 let locationCoords;
 let map;
 
-if (navigator.geolocation) {
-  navigator.geolocation.getCurrentPosition(function (position) {
-    const apiKey =
-      'AAPK8010778b0f5f4125aaab7a3400c5fdabUVgNVHKxZ2mKDOhlZS881By7lT4g8u5N3VM-PmayJSt4lJ4RyxDA2WdBFPorPcod';
-    const basemapEnum = 'ArcGIS:Navigation';
-    const { latitude } = position.coords;
-    const { longitude } = position.coords;
-
-    const coords = [latitude, longitude];
-
-    map = L.map('map', {
-      minZoom: 2,
-    }).setView(coords, 14);
-
-    L.esri.Vector.vectorBasemapLayer(basemapEnum, {
-      apiKey: apiKey,
-    }).addTo(map);
-
-    const searchControl = L.esri.Geocoding.geosearch({
-      position: 'topleft',
-      placeholder: 'Enter an address or place',
-      useMapBounds: false,
-      providers: [
-        L.esri.Geocoding.arcgisOnlineProvider({
-          apikey: apiKey,
-          nearby: {
-            lat: coords[0],
-            lng: coords[1],
-          },
-        }),
-      ],
-    }).addTo(map);
-
-    var results = L.layerGroup().addTo(map);
-
-    searchControl.on('results', function (data) {
-      results.clearLayers();
-      for (var i = data.results.length - 1; i >= 0; i--) {
-        const marker = L.marker(data.results[i].latlng).bindPopup(
-          data.results[i].properties.LongLabel
-        );
-        results.addLayer(marker);
-        marker.openPopup();
-
-        const shortAdress = data.results[i].properties.LongLabel.split(',');
-
-        locationCoords = data.results[i].latlng;
-        inputLocation.value = shortAdress[0];
-      }
+function getPosition() {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(loadMap.bind(this), function () {
+      alert('Could not get your position');
     });
+  }
+}
+
+function loadMap(position) {
+  const apiKey =
+    'AAPK8010778b0f5f4125aaab7a3400c5fdabUVgNVHKxZ2mKDOhlZS881By7lT4g8u5N3VM-PmayJSt4lJ4RyxDA2WdBFPorPcod';
+  const basemapEnum = 'ArcGIS:Navigation';
+  const { latitude } = position.coords;
+  const { longitude } = position.coords;
+
+  const coords = [latitude, longitude];
+
+  map = L.map('map', {
+    minZoom: 2,
+  }).setView(coords, 14);
+
+  L.esri.Vector.vectorBasemapLayer(basemapEnum, {
+    apiKey: apiKey,
+  }).addTo(map);
+
+  const searchControl = L.esri.Geocoding.geosearch({
+    position: 'topleft',
+    placeholder: 'Enter an address or place',
+    useMapBounds: false,
+    providers: [
+      L.esri.Geocoding.arcgisOnlineProvider({
+        apikey: apiKey,
+        nearby: {
+          lat: coords[0],
+          lng: coords[1],
+        },
+      }),
+    ],
+  }).addTo(map);
+
+  var results = L.layerGroup().addTo(map);
+
+  searchControl.on('results', function (data) {
+    results.clearLayers();
+    for (var i = data.results.length - 1; i >= 0; i--) {
+      const marker = L.marker(data.results[i].latlng).bindPopup(
+        data.results[i].properties.LongLabel
+      );
+      results.addLayer(marker);
+      marker.openPopup();
+
+      const shortAdress = data.results[i].properties.LongLabel.split(',');
+
+      locationCoords = data.results[i].latlng;
+      inputLocation.value = shortAdress[0];
+    }
   });
 }
 
 btnAdd.addEventListener('click', addNewForm);
 btnSave.addEventListener('click', renderBusiness);
-
-function saveBusiness() {
-  const business = {
-    coords: locationCoords,
-    name: inputName.value,
-    type: inputType.value,
-    language: inputLanguage.options[inputLanguage.selectedIndex].text,
-    location: inputLocation.value,
-  };
-
-  busisnesses.push(business);
-}
 
 let formSaved = false;
 
@@ -92,42 +86,7 @@ function renderBusiness() {
       'Select language' &&
     inputLocation.value != ''
   ) {
-    const addBusiness = `
-    <li class="business" >
-    <h2 class="business_name">${inputName.value}</h2>
-    <div class="business_details">
-      <h3 class="business_type">${inputType.value}</h3>
-    </div>
-    <div class="business_details">
-      <h3 class="business_language">${
-        inputLanguage.options[inputLanguage.selectedIndex].text
-      }</h3>
-    </div>
-    <div class="business_details">
-      <h3 id = "${'businessAdress'}" class="business_location">${
-      inputLocation.value
-    }
-      <button type="button" id="${
-        'btnShowOnMap' + busisnesses.length
-      }" class="form_btn business_btn--map" onclick="showOnMap(this.id)">
-        <span class="business_btn--map_icon">
-          <ion-icon name="map-outline" role="img" class="md hydrated" aria-label="map outline"></ion-icon>
-        </span>
-      </button>
-      </h3>
-    </div>
-    <div class="business_details">
-      <button id="${
-        'openGm' + busisnesses.length
-      }" type="button" class="form__btn business_btn--opengm" onclick="openGm(this.id)">
-      Open Google maps
-      </button>
-    </div>
-  </li>
-  `;
-
-    form.insertAdjacentHTML('beforebegin', addBusiness);
-
+    renderBusinessOnList();
     saveBusiness();
     renderBusinessMarker();
     claerInputs();
@@ -141,20 +100,20 @@ function renderBusiness() {
   }
 }
 
-function addNewForm() {
-  if (formSaved == true) {
-    showForm();
-    formSaved = false;
-  } else {
-    if (
-      locationCoords != null &&
-      inputName.value != '' &&
-      inputType.value != '' &&
-      inputLanguage.options[inputLanguage.selectedIndex].text !=
-        'Select language' &&
-      inputLocation.value != ''
-    ) {
-      const addBusiness = `
+function saveBusiness() {
+  const business = {
+    coords: locationCoords,
+    name: inputName.value,
+    type: inputType.value,
+    language: inputLanguage.options[inputLanguage.selectedIndex].text,
+    location: inputLocation.value,
+  };
+
+  busisnesses.push(business);
+}
+
+function renderBusinessOnList() {
+  const addBusiness = `
       <li class="business" >
       <h2 class="business_name">${inputName.value}</h2>
       <div class="business_details">
@@ -167,8 +126,8 @@ function addNewForm() {
       </div>
       <div class="business_details">
         <h3 id = "${'businessAdress'}" class="business_location">${
-        inputLocation.value
-      }
+    inputLocation.value
+  }
         <button type="button" id="${
           'btnShowOnMap' + busisnesses.length
         }" class="form_btn business_btn--map" onclick="showOnMap(this.id)">
@@ -188,8 +147,23 @@ function addNewForm() {
     </li>
     `;
 
-      form.insertAdjacentHTML('beforebegin', addBusiness);
+  form.insertAdjacentHTML('beforebegin', addBusiness);
+}
 
+function addNewForm() {
+  if (formSaved == true) {
+    showForm();
+    formSaved = false;
+  } else {
+    if (
+      locationCoords != null &&
+      inputName.value != '' &&
+      inputType.value != '' &&
+      inputLanguage.options[inputLanguage.selectedIndex].text !=
+        'Select language' &&
+      inputLocation.value != ''
+    ) {
+      renderBusinessOnList();
       saveBusiness();
       renderBusinessMarker();
       claerInputs();
@@ -238,7 +212,7 @@ function renderBusinessMarker() {
 function showOnMap(btnID) {
   const id = btnID.replace(/\D/g, '');
 
-  map.flyTo(busisnesses[id].coords, 15);
+  map.flyTo(busisnesses[id].coords, 18);
 }
 
 function openGm(btnID) {
@@ -248,3 +222,5 @@ function openGm(btnID) {
     `https://www.google.com/maps/place/${busisnesses[id].location}/@${busisnesses[id].coords.lat}, ${busisnesses[id].coords.lng}`
   );
 }
+
+getPosition();
