@@ -1,9 +1,5 @@
 'use strict';
 
-const apiKey =
-  'AAPK8010778b0f5f4125aaab7a3400c5fdabUVgNVHKxZ2mKDOhlZS881By7lT4g8u5N3VM-PmayJSt4lJ4RyxDA2WdBFPorPcod';
-const basemapEnum = 'ArcGIS:Navigation';
-
 const form = document.querySelector('.form');
 const busissnesesList = document.querySelector('businesses');
 const inputName = document.querySelector('.form__input--name');
@@ -19,6 +15,9 @@ let map;
 
 if (navigator.geolocation) {
   navigator.geolocation.getCurrentPosition(function (position) {
+    const apiKey =
+      'AAPK8010778b0f5f4125aaab7a3400c5fdabUVgNVHKxZ2mKDOhlZS881By7lT4g8u5N3VM-PmayJSt4lJ4RyxDA2WdBFPorPcod';
+    const basemapEnum = 'ArcGIS:Navigation';
     const { latitude } = position.coords;
     const { longitude } = position.coords;
 
