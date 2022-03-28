@@ -12,11 +12,38 @@ const btnAdd = document.querySelector('.form_btn--add');
 let busisnesses = [];
 let locationCoords;
 let map;
+let languages;
+
+(function () {
+  fetch(
+    'https://gist.githubusercontent.com/piraveen/fafd0d984b2236e809d03a0e306c8a4d/raw/4258894f85de7752b78537a4aa66e027090c27ad/languages.json'
+  )
+    .then(response => response.json())
+    .then(langmap => readLanguageMap(langmap));
+})();
+
+function readLanguageMap(langmap) {
+  languages = langmap;
+  const langCodes = Object.keys(langmap);
+
+  langCodes.forEach(code => insertLanguage(code));
+}
+
+function insertLanguage(code) {
+  const lanSelect = `
+<option value="${code}">${
+    languages[code].name.split(',')[0].split(';')[0]
+  }</option>
+`;
+
+  inputLanguage.insertAdjacentHTML('beforeend', lanSelect);
+}
 
 function getPosition() {
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(loadMap.bind(this), function () {
       alert('Could not get your position');
+      return getPosition();
     });
   }
 }
@@ -89,7 +116,7 @@ function renderBusiness() {
     renderBusinessOnList();
     saveBusiness();
     renderBusinessMarker();
-    claerInputs();
+    clearInputs();
     hideForm();
 
     formSaved = true;
@@ -106,6 +133,7 @@ function saveBusiness() {
     name: inputName.value,
     type: inputType.value,
     language: inputLanguage.options[inputLanguage.selectedIndex].text,
+    languageCode: inputLanguage.value,
     location: inputLocation.value,
   };
 
@@ -152,6 +180,7 @@ function renderBusinessOnList() {
 
 function addNewForm() {
   if (formSaved == true) {
+    clearInputs();
     showForm();
     formSaved = false;
   } else {
@@ -166,7 +195,7 @@ function addNewForm() {
       renderBusinessOnList();
       saveBusiness();
       renderBusinessMarker();
-      claerInputs();
+      clearInputs();
     } else {
       alert(
         '!!WARNING!! INVALID INPUT! You must finish previous form before adding a new one!'
@@ -175,7 +204,7 @@ function addNewForm() {
   }
 }
 
-function claerInputs() {
+function clearInputs() {
   inputName.value = '';
   inputType.value = '';
   inputLanguage.selectedIndex = 0;
